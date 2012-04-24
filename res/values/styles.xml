@@ -236,7 +236,7 @@
     </style>
 
     <style name="SimImportTheme"
-           parent="@android:style/Theme.Holo.Light.DarkActionBar">
+           parent="@android:style/Theme.Holo">
         <item name="android:actionBarStyle">@style/ContactsActionBarStyle</item>
     </style>
 

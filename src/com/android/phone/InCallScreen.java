@@ -75,7 +75,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 
 import java.util.List;
-import android.view.MotionEvent;
+
 
 /**
  * Phone app "in call" screen.
@@ -284,10 +284,6 @@ public class InCallScreen extends Activity
     public boolean Enable_StatusBar_In_Call = false;
     public boolean Enable_LightsOut_In_Call = true;
     public boolean Exit_To_Home_Screen = false;
-
-    //Trackball Answer
-    private CallFeaturesSetting mSettings;
-    Long mTrackballHitTime;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -4543,47 +4539,6 @@ public class InCallScreen extends Activity
         if (DBG) log("  - uiMode = " + newConfig.uiMode);
         // See bug 2089513.
     }
-
-    /**
-     * Adding Trackball Answer -- Nushio
-     */
-   @Override
-   public boolean onTrackballEvent(MotionEvent event) {
-     mSettings = CallFeaturesSetting.getInstance(this);
-
-     long realTime = android.os.SystemClock.elapsedRealtime();
-     long downTime = event.getDownTime();
-     if(mCM.hasActiveRingingCall() && !mSettings.mTrackAnswer.equals("-1")){ //Call is ringing and Trackball Answer is on
-       if(event.getAction() == MotionEvent.ACTION_DOWN){
-          if(mSettings.mTrackAnswer.equals("dt")){
-            //Double Tap Code taken from MetalHead's Double-Tap-to-skip-song.
-            long timeBetweenHits;
-            if (mTrackballHitTime == null)
-              mTrackballHitTime = realTime;
-            else{
-              if (realTime > mTrackballHitTime)
-                timeBetweenHits = realTime - mTrackballHitTime; // System clock rolled over
-              else
-                timeBetweenHits = realTime + (Long.MAX_VALUE - mTrackballHitTime); // Time to Answer Call
-              if (timeBetweenHits < 400) { //400 being double-tap duration distance
-                internalAnswerCall();
-              }
-              mTrackballHitTime = null;
-           }
-         }
-       }else if(event.getAction() == MotionEvent.ACTION_UP){
-         int delay = -1;
-         try{
-           delay = Integer.parseInt(mSettings.mTrackAnswer);
-         }catch(Exception e){}
-         if(delay > -1){
-           if(realTime > (downTime + delay))
-             internalAnswerCall();
-         }
-       }
-     }
-   return super.onTrackballEvent(event);
-   }
 
     /**
      * Handles an incoming RING event from the telephony layer.
